@@ -4,21 +4,162 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Color Palette Generator</title>
-
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: linear-gradient(135deg, #f6f8fd 0%, #f1f1f1 100%);
+        padding: 40px 20px;
+      }
+
       h1 {
-        color: purple;
+        background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin: 20px 0 40px;
+        font-size: 3rem;
+        font-weight: 800;
+        text-align: center;
+        letter-spacing: -1px;
+      }
+
+      .container {
+        background-color: white;
+        width: 95%;
+        max-width: 1200px;
+        height: 65vh;
+        display: flex;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        overflow: hidden;
+      }
+
+      .color {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .color:hover {
+        transform: scale(1.03);
+        z-index: 2;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+      }
+
+      .color span {
+        opacity: 0;
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        transform: translateY(10px);
+      }
+
+      .color:hover span {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      form {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 20px 0;
+        width: 100%;
+        max-width: 700px;
+        padding: 0 20px;
+      }
+
+      input[type="text"] {
+        padding: 16px 24px;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        font-size: 16px;
+        width: 100%;
+        transition: all 0.3s ease;
+        outline: none;
+        background-color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      input[type="text"]:focus {
+        border-color: #6b46c1;
+        box-shadow: 0 4px 20px rgba(107, 70, 193, 0.15);
+      }
+
+      button {
+        padding: 16px 32px;
+        background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(107, 70, 193, 0.2);
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(107, 70, 193, 0.3);
+      }
+
+      button:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(107, 70, 193, 0.2);
+      }
+
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2.5rem;
+        }
+
+        .container {
+          height: 50vh;
+        }
+
+        form {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Hello!!!</h1>
+    <h1>Color Pallete Generator</h1>
 
-    <form>
+    <div class="container"></div>
+
+    <form id="form">
+      <!-- Added id here -->
       <input type="text" name="query" />
-      <button>Submit</button>
+      <button type="submit">Submit</button>
     </form>
-
     <script>
       const form = document.querySelector("#form");
       form.addEventListener("submit", function (event) {
@@ -27,7 +168,7 @@
         fetch("/palette", {
           method: "POST",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/x-www-form-urlencoded", // Added headers
           },
           body: new URLSearchParams({
             query: query,
@@ -35,7 +176,25 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log(data);
+            const colors = data.colors;
+            const container = document.querySelector(".container");
+            container.innerHTML = "";
+            for (const color of colors) {
+              const div = document.createElement("div");
+              div.classList.add("color");
+              div.style.backgroundColor = color;
+
+              div.style.width = `calc(100%/ ${colors.length})`;
+
+              div.addEventListener("click", function () {
+                navigator.clipboard.writeText(color);
+              });
+
+              const span = document.createElement("span");
+              span.innerText = color;
+              div.appendChild(span);
+              container.appendChild(div);
+            }
           })
           .catch((error) => console.error("Error:", error));
       });
