@@ -33,8 +33,11 @@
 source venv/bin/activate  # On Windows: venv\Scripts\activate</code></pre>
                 </li>
                 <li>Install dependencies:
-                    <pre><code>pip install -r requirements.txt</code></pre>
-                </li>
+    <pre><code>pip install Flask
+pip install python-dotenv
+pip install openai
+pip install requests</code></pre>
+</li>
                 <li>Set up your OpenAI API key in .env file</li>
                 <li>Run the application:
                     <pre><code>python app.py</code></pre>
